@@ -70,3 +70,42 @@ pwd
 docker history 容器id
 ```
 
+## 覆盖与追加
+
+run运行的时候附加执行"ls -a"命令
+
+``` bash
+vim my-dockerfile
+FROM centos
+CMD ["ls","-a"]
+```
+
+构建并执行，发现"ls -a"也被附带执行了
+
+``` bash
+docker build -f my_dockerfile -t my_docker_name .
+docker run dd8e4401d27f
+```
+
+但这个时候我们追加"-l"就会报错
+
+``` bash
+docker run dd8e4401d27f -l
+```
+
+原因是在用CMD的情况下，"-l"替换了CMD["ls","-a"]命令，而CMD["-l"]不是CMD["ls","-l"]所以报错
+
+为了解决这个问题，我们用ENTRYPOINT替换CMD
+
+``` bash
+FROM centos
+ENTRYPOINT ["ls","-a"]
+```
+
+构建并执行，追加"-l"，成功
+
+``` bash
+docker build -f my_dockerfile -t my_docker_name .
+docker run 3c4c9621edpl -l
+```
+
